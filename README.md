@@ -59,9 +59,7 @@ due to GitHub's file size limits. Follow these steps to generate them:
 
 3. Upload `results.csv` to Colab using the files panel on the left
 
-4. Run the following code in Colab to generate the model:
-
-# Run the football-match-preditor file's code on google collab
+4. Run all cells in the notebook (i.e football-match-predictor.ipynb)
 
 5. Download `football_model.pkl` and `team_stats.pkl` from 
    the Colab files panel on the left sidebar
