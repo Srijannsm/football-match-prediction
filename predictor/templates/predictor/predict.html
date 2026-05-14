@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Football Match Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --surface2: #21262d;
+            --border: rgba(255,255,255,0.08);
+            --accent: #238636;
+            --accent2: #58a6ff;
+            --text: #e6edf3;
+            --muted: #7d8590;
+            --danger: #f85149;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: var(--muted);
+            font-size: 15px;
+            font-weight: 300;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .teams-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 16px;
+            align-items: end;
+            margin-bottom: 24px;
+        }
+
+        .vs {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--muted);
+            text-align: center;
+            padding-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        select:focus {
+            border-color: var(--accent2);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            opacity: 0.85;
+            transform: translateY(-1px);
+        }
+
+        .result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            background: var(--accent);
+            padding: 24px 32px;
+            text-align: center;
+        }
+
+        .result-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .result-header p {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .probabilities {
+            padding: 28px 32px;
+        }
+
+        .prob-title {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .prob-row {
+            margin-bottom: 16px;
+        }
+
+        .prob-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .prob-label span:last-child {
+            font-weight: 500;
+            color: var(--accent2);
+        }
+
+        .prob-bar-bg {
+            background: var(--surface2);
+            border-radius: 6px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .prob-bar {
+            height: 100%;
+            border-radius: 6px;
+            background: var(--accent2);
+            transition: width 1s ease;
+        }
+
+        .prob-bar.green { background: var(--accent); }
+        .prob-bar.gray { background: var(--muted); }
+
+        .error-card {
+            padding: 16px 20px;
+            background: rgba(248,81,73,0.1);
+            border: 1px solid rgba(248,81,73,0.3);
+            border-radius: 10px;
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        .team-stats {
+            padding: 0 32px 28px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            border-top: 1px solid var(--border);
+            padding-top: 24px;
+        }
+
+        .stat-box {
+            background: var(--surface2);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .stat-box h4 {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .stat-row span:last-child {
+            font-weight: 500;
+            color: var(--accent2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚽ Match Predictor</h1>
+            <p>Select two international teams to predict the match outcome</p>
+        </header>
+
+        <div class="card">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="teams-grid">
+                    <div>
+                        <label>Home Team</label>
+                        <select name="home_team">
+                            {% for team in all_teams %}
+                                <option value="{{ team }}" 
+                                    {% if team == home_team %}selected{% endif %}>
+                                    {{ team }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div>
+                        <label>Away Team</label>
+                        <select name="away_team">
+                            {% for team in all_teams %}
+                                <option value="{{ team }}"
+                                    {% if team == away_team %}selected{% endif %}>
+                                    {{ team }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button type="submit">Predict Match Outcome</button>
+            </form>
+
+            {% if error %}
+            <div class="error-card">⚠ {{ error }}</div>
+            {% endif %}
+        </div>
+
+        {% if result %}
+        <div class="result-card">
+            <div class="result-header">
+                <h2>🏆 {{ result }}</h2>
+                <p>{{ home_team }} vs {{ away_team }}</p>
+            </div>
+
+            <div class="probabilities">
+                <div class="prob-title">Win Probabilities</div>
+
+                <div class="prob-row">
+                    <div class="prob-label">
+                        <span>{{ home_team }}</span>
+                        <span>{{ home_win_prob }}%</span>
+                    </div>
+                    <div class="prob-bar-bg">
+                        <div class="prob-bar green" style="width: {{ home_win_prob }}%"></div>
+                    </div>
+                </div>
+
+                <div class="prob-row">
+                    <div class="prob-label">
+                        <span>Draw</span>
+                        <span>{{ draw_prob }}%</span>
+                    </div>
+                    <div class="prob-bar-bg">
+                        <div class="prob-bar gray" style="width: {{ draw_prob }}%"></div>
+                    </div>
+                </div>
+
+                <div class="prob-row">
+                    <div class="prob-label">
+                        <span>{{ away_team }}</span>
+                        <span>{{ away_win_prob }}%</span>
+                    </div>
+                    <div class="prob-bar-bg">
+                        <div class="prob-bar" style="width: {{ away_win_prob }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
